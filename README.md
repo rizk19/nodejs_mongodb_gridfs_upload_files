@@ -9,4 +9,15 @@ npm install
 ```
 node src/server.js
 ```
+
+### Website
+go to deployment url 
+```
+http://localhost:8080/
+```
+see uploaded file list
+```
+http://localhost:8080/files
+```
+
 credit to Bezkoder
