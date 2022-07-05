@@ -9,3 +9,4 @@ npm install
 ```
 node src/server.js
 ```
+credit to Bezkoder
