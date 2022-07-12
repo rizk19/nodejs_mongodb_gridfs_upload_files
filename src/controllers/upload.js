@@ -49,7 +49,7 @@ const getListFiles = async (req, res) => {
     await mongoClient.connect();
 
     const database = mongoClient.db(dbConfig.database);
-    const images = database.collection("photos.files");
+    const images = database.collection(dbConfig.imgBucket+".files");
 
     const countCursor = images.estimatedDocumentCount()
     const cursor = images.find({ });
