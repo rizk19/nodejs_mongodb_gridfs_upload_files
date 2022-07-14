@@ -3,7 +3,6 @@ const dbConfig = require("../config/db");
 
 const MongoClient = require("mongodb").MongoClient;
 const GridFSBucket = require("mongodb").GridFSBucket;
-const ObjectID = require('mongodb').ObjectId;
 
 const url = dbConfig.url;
 
@@ -50,13 +49,59 @@ const getListFiles = async (req, res) => {
 
     const database = mongoClient.db(dbConfig.database);
     const images = database.collection(dbConfig.imgBucket+".files");
+    const pdf = database.collection(dbConfig.pdfBucket+".files");
+
+    const countCursor = images.estimatedDocumentCount()
+    const cursor = images.find({ });
+
+    const countCursorPdf = pdf.estimatedDocumentCount()
+    const cursorPdf = pdf.find({ });
+
+    if ((await countCursor === 0) && (await countCursorPdf === 0)) {
+      return res.status(500).send({
+        message: "No image/photos/pdf found!",
+      });
+    }
+
+    let fileInfos = [];
+    if ((await countCursor != 0)) {
+      await cursor.forEach((doc) => {
+        fileInfos.push({
+          name: doc.filename,
+          url: baseUrl + doc.filename,
+        });
+      });
+    }
+    if ((await countCursorPdf != 0)) {
+      await cursorPdf.forEach((doc) => {
+        fileInfos.push({
+          name: doc.filename,
+          url: baseUrl + doc.filename,
+        });
+      });
+    }
+
+    return res.status(200).send(fileInfos);
+  } catch (error) {
+    return res.status(500).send({
+      message: error.message,
+    });
+  }
+};
+
+const getListImg = async (req, res) => {
+  try {
+    await mongoClient.connect();
+
+    const database = mongoClient.db(dbConfig.database);
+    const images = database.collection(dbConfig.imgBucket+".files");
 
     const countCursor = images.estimatedDocumentCount()
     const cursor = images.find({ });
 
     if ((await countCursor === 0)) {
       return res.status(500).send({
-        message: "No files/photos found!",
+        message: "No image/photos found!",
       });
     }
 
@@ -76,13 +121,78 @@ const getListFiles = async (req, res) => {
   }
 };
 
-const download = async (req, res) => {
+const getListPdf = async (req, res) => {
   try {
     await mongoClient.connect();
 
     const database = mongoClient.db(dbConfig.database);
+    const pdfs = database.collection(dbConfig.pdfBucket+".files");
+
+    const countCursor = pdfs.estimatedDocumentCount()
+    const cursor = pdfs.find({ });
+
+    if ((await countCursor === 0)) {
+      return res.status(500).send({
+        message: "No pdf found!",
+      });
+    }
+
+    let fileInfos = [];
+    await cursor.forEach((doc) => {
+      fileInfos.push({
+        name: doc.filename,
+        url: baseUrl + doc.filename,
+      });
+    });
+
+    return res.status(200).send(fileInfos);
+  } catch (error) {
+    return res.status(500).send({
+      message: error.message,
+    });
+  }
+};
+
+// const download = async (req, res) => {
+//   try {
+//     await mongoClient.connect();
+
+//     const database = mongoClient.db(dbConfig.database);
+//     const bucket = new GridFSBucket(database, {
+//       bucketName: dbConfig.imgBucket,
+//     });
+
+//     let downloadStream = bucket.openDownloadStreamByName(req.params.name);
+
+//     downloadStream.on("data", function (data) {
+//       return res.status(200).write(data);
+//     });
+
+//     downloadStream.on("error", function (err) {
+//       return res.status(404).send({ message: "Cannot download the Image!" });
+//     });
+
+//     downloadStream.on("end", () => {
+//       return res.end();
+//     });
+//   } catch (error) {
+//     return res.status(500).send({
+//       message: error.message,
+//     });
+//   }
+// };
+
+const download = async (req, res) => {
+  console.log(req.params);
+  try {
+    const match = ['pdf', 'img']
+    const splitUrl = req.originalUrl.split("/")
+    const typeBucket = match.indexOf(splitUrl[1])
+    await mongoClient.connect();
+
+    const database = mongoClient.db(dbConfig.database);
     const bucket = new GridFSBucket(database, {
-      bucketName: dbConfig.imgBucket,
+      bucketName: typeBucket == 0 ? dbConfig.pdfBucket : typeBucket == 1 ? dbConfig.imgBucket : dbConfig.imgBucket,
     });
 
     let downloadStream = bucket.openDownloadStreamByName(req.params.name);
@@ -108,5 +218,7 @@ const download = async (req, res) => {
 module.exports = {
   uploadFiles,
   getListFiles,
+  getListPdf,
+  getListImg,
   download,
 };

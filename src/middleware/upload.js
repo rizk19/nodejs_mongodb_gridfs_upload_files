@@ -7,17 +7,22 @@ var storage = new GridFsStorage({
   url: dbConfig.url + dbConfig.database,
   options: { useNewUrlParser: true, useUnifiedTopology: true },
   file: (req, file) => {
-    const match = ["image/png", "image/jpeg"];
+    const match = ["image/png", "image/jpeg", "application/pdf"];
 
-    if (match.indexOf(file.mimetype) === -1) {
+    if (match.indexOf(file.mimetype) === 2) {
+      return {
+        bucketName: dbConfig.pdfBucket,
+        filename: `${Date.now()}-raycorp-${file.originalname}`
+      };
+    } else if (match.indexOf(file.mimetype) === 0 || match.indexOf(file.mimetype) === 1) {
+      return {
+        bucketName: dbConfig.imgBucket,
+        filename: `${Date.now()}-raycorp-${file.originalname}`
+      };
+    } else {
       const filename = `${Date.now()}-raycorp-${file.originalname}`;
       return filename;
     }
-
-    return {
-      bucketName: dbConfig.imgBucket,
-      filename: `${Date.now()}-raycorp-${file.originalname}`
-    };
   }
 });
 

@@ -8,7 +8,10 @@ let routes = app => {
 
   router.post("/upload", uploadController.uploadFiles);
   router.get("/files", uploadController.getListFiles);
-  router.get("/files/:name", uploadController.download);
+  router.get("/img", uploadController.getListImg);
+  router.get("/pdf", uploadController.getListPdf);
+  router.get("/pdf/:name", uploadController.download);
+  router.get("/img/:name", uploadController.download);
 
   return app.use("/", router);
 };
