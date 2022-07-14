@@ -1,4 +1,4 @@
-# Node.js Upload multiple images to MongoDB Template using GridFS
+# Node.js Upload images or pdf to MongoDB Template using GridFS
 
 ## Project setup
 ```
