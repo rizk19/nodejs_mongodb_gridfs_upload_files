@@ -30,9 +30,9 @@ http://localhost:8080/pdf
 to download try add params to the url with the file name
 see uploaded file list
 ```
-http://localhost:8080/img:name
+http://localhost:8080/img/:name
 or
-http://localhost:8080/pdf:name
+http://localhost:8080/pdf/:name
 ```
 
 credit to Bezkoder
