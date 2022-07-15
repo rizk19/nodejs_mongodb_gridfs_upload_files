@@ -8,19 +8,20 @@ var storage = new GridFsStorage({
   options: { useNewUrlParser: true, useUnifiedTopology: true },
   file: (req, file) => {
     const match = ["image/png", "image/jpeg", "application/pdf"];
+    const splitName = file.originalname.toLowerCase().split(' ').join('_');
 
     if (match.indexOf(file.mimetype) === 2) {
       return {
         bucketName: dbConfig.pdfBucket,
-        filename: `${Date.now()}-raycorp-${file.originalname}`
+        filename: `${Date.now()}-raycorp-${splitName}`
       };
     } else if (match.indexOf(file.mimetype) === 0 || match.indexOf(file.mimetype) === 1) {
       return {
         bucketName: dbConfig.imgBucket,
-        filename: `${Date.now()}-raycorp-${file.originalname}`
+        filename: `${Date.now()}-raycorp-${splitName}`
       };
     } else {
-      const filename = `${Date.now()}-raycorp-${file.originalname}`;
+      const filename = `${Date.now()}-raycorp-${splitName}`;
       return filename;
     }
   }

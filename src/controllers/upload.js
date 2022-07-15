@@ -6,14 +6,14 @@ const GridFSBucket = require("mongodb").GridFSBucket;
 
 const url = dbConfig.url;
 
-const baseUrl = "http://localhost:8080/files/";
+const baseUrl = "http://localhost:8080/";
 
 const mongoClient = new MongoClient(url);
 
 const uploadFiles = async (req, res) => {
   try {
     await upload(req, res);
-    console.log(req.files);
+    // console.log(req.files);
 
     if (req.files.length <= 0) {
       return res
@@ -68,7 +68,7 @@ const getListFiles = async (req, res) => {
       await cursor.forEach((doc) => {
         fileInfos.push({
           name: doc.filename,
-          url: baseUrl + doc.filename,
+          url: baseUrl + 'img/' + doc.filename,
         });
       });
     }
@@ -76,7 +76,7 @@ const getListFiles = async (req, res) => {
       await cursorPdf.forEach((doc) => {
         fileInfos.push({
           name: doc.filename,
-          url: baseUrl + doc.filename,
+          url: baseUrl + 'pdf/' + doc.filename,
         });
       });
     }
@@ -109,7 +109,7 @@ const getListImg = async (req, res) => {
     await cursor.forEach((doc) => {
       fileInfos.push({
         name: doc.filename,
-        url: baseUrl + doc.filename,
+        url: baseUrl + 'img/' + doc.filename,
       });
     });
 
@@ -141,7 +141,7 @@ const getListPdf = async (req, res) => {
     await cursor.forEach((doc) => {
       fileInfos.push({
         name: doc.filename,
-        url: baseUrl + doc.filename,
+        url: baseUrl + 'pdf/' + doc.filename,
       });
     });
 
@@ -183,7 +183,6 @@ const getListPdf = async (req, res) => {
 // };
 
 const download = async (req, res) => {
-  console.log(req.params);
   try {
     const match = ['pdf', 'img']
     const splitUrl = req.originalUrl.split("/")
